@@ -109,7 +109,8 @@ class RedemptionController extends Controller
                 'Serial Number: ' . $serial_number,
                 'Expire Date: ' . $expired_date->format('Y-m-d')
             ],
-            'type' => 'success'
+            'type' => 'success',
+            'duration' => 0
         ]);
 
     }

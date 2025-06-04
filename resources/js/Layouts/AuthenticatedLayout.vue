@@ -1,10 +1,10 @@
 <script setup>
 import {Head, usePage} from '@inertiajs/vue3'
-// import Sidebar from '@/Components/Sidebar/Sidebar.vue'
-// import Navbar from '@/Components/Navbar.vue'
-// import { sidebarState } from '@/Composables'
+import Sidebar from '@/Components/Sidebar/Sidebar.vue'
+import Navbar from '@/Components/Navbar.vue'
+import { sidebarState } from '@/Composables'
 import ToastList from "@/Components/ToastList.vue";
-// import ConfirmationDialog from "@/Components/ConfirmationDialog.vue";
+import ConfirmationDialog from "@/Components/ConfirmationDialog.vue";
 
 defineProps({
     title: String
@@ -15,7 +15,7 @@ defineProps({
     <Head :title="title"></Head>
 
     <div
-        class="min-h-screen bg-[#e6f3ff]"
+        class="min-h-screen bg-gray-25"
     >
         <!-- Sidebar -->
         <!-- <Sidebar /> -->
@@ -24,14 +24,14 @@ defineProps({
             style="transition-property: margin; transition-duration: 150ms"
             :class="[
                 'min-h-screen flex flex-col',
-                // {
-                //     'lg:ml-[252px]': sidebarState.isOpen,
-                //     'md:ml-0 lg:ml-[84px]': !sidebarState.isOpen,
-                // },
+                {
+                    // 'lg:ml-[252px]': sidebarState.isOpen,
+                    // 'md:ml-0 lg:ml-[84px]': !sidebarState.isOpen,
+                },
             ]"
         >
             <!-- Navbar -->
-            <!-- <Navbar :title="title" /> -->
+            <Navbar :title="title" />
 
             <!-- Page Content -->
             <main class="flex flex-1 justify-center items-start px-3 pt-3 pb-12 md:px-5 md:pt-5">
@@ -39,7 +39,7 @@ defineProps({
                     <!-- Toast -->
                     <ToastList />
                     <!-- Confirmation Dialog -->
-                    <!-- <ConfirmationDialog /> -->
+                    <ConfirmationDialog />
 
                     <slot />
                 </div>

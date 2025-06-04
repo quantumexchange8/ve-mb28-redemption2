@@ -10,7 +10,7 @@ import {
 
 const props = defineProps({
     title: String,
-    message: String,
+    message: [String, Array],
     type: String, // Accepts 'success', 'info', 'warning', 'error'
     duration: {
         type: Number,
@@ -19,7 +19,9 @@ const props = defineProps({
 });
 
 onMounted(() => {
-    setTimeout(() => emit('remove'), props.duration);
+    if (props.duration > 0) {
+        setTimeout(() => emit('remove'), props.duration);
+    }
 });
 
 const emit = defineEmits(['remove']);

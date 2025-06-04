@@ -19,7 +19,7 @@ const minDate = ref(new Date(today.getFullYear(), today.getMonth(), today.getDat
 function submitForm() {
   form.post('/redeem/redeemCode', {
     preserveScroll: true,
-    // onSuccess: () => form.reset(),
+    onSuccess: () => form.reset(),
   });
 }
 

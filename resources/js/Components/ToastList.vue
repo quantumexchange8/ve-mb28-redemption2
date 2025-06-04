@@ -13,6 +13,7 @@ let removeFinishEventListener = Inertia.on("finish", () => {
             title: page.props.toast.title,
             message: page.props.toast.message,
             type: page.props.toast.type,
+            duration: page.props.toast.duration,
         });
     }
 });
@@ -37,6 +38,7 @@ function remove(index) {
             :title="item.title"
             :message="item.message"
             :type="item.type"
+            :duration="item.duration"
             @remove="remove(index)"
         />
     </TransitionGroup>
