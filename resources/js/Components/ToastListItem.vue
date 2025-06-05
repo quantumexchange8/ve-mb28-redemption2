@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted} from "vue";
+import { onMounted, onUnmounted  } from 'vue';
 import {
     IconCircleCheckFilled,
     IconAlertTriangleFilled,
@@ -25,6 +25,10 @@ onMounted(() => {
 });
 
 const emit = defineEmits(['remove']);
+
+onUnmounted(() => {
+  emit('remove');
+});
 
 // Determine icon based on the type
 const iconComponent = {

@@ -1,16 +1,16 @@
 /* Primary and Surface Palettes */
 :root {
-    --p-primary-50:  #ecfeff;
-    --p-primary-100: #cffafe;
-    --p-primary-200: #a5f3fc;
-    --p-primary-300: #67e8f9;
-    --p-primary-400: #22d3ee;
-    --p-primary-500: #06b6d4;
-    --p-primary-600: #0891b2;
-    --p-primary-700: #0e7490;
-    --p-primary-800: #155e75;
-    --p-primary-900: #164e63;
-    --p-primary-950: #083344;
+    --p-primary-50:  #eff6ff;
+    --p-primary-100: #dbeafe;
+    --p-primary-200: #bfdbfe;
+    --p-primary-300: #93c5fd;
+    --p-primary-400: #60a5fa;
+    --p-primary-500: #3b82f6;
+    --p-primary-600: #2563eb;
+    --p-primary-700: #1d4ed8;
+    --p-primary-800: #1e40af;
+    --p-primary-900: #1e3a8a;
+    --p-primary-950: #172554;
     --p-surface-0: #ffffff;
     --p-surface-50: #fafafa;
     --p-surface-100: #f4f4f5;

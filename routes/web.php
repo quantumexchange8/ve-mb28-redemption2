@@ -16,6 +16,8 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::prefix('redeem')->group(function () {
+        Route::get('/getLicenses', [RedemptionController::class, 'getLicenses'])->name('redeem.getLicenses');
+        
         Route::post('/redeemCode', [RedemptionController::class, 'redeemCode'])->name('redeem.redeemCode');
     });
 

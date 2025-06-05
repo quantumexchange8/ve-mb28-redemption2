@@ -10,7 +10,11 @@ class Code extends Model
     use HasFactory;
 
     protected $fillable = [
-        'meta_login', 'status', 'expired_date'
+        'redemption_code',
+        'meta_login',
+        'license_name',
+        'expired_date',
+        'status',
     ];
 
     protected $casts = [

@@ -1,13 +1,13 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { useForm } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import InputError from '@/Components/InputError.vue';
-import { InputText, Button, DatePicker } from 'primevue';
+import { InputText, Button, Select, DatePicker } from 'primevue';
 
 const form = useForm({
-    redemption_code: '',
+    product: '',
     email: '',
     expired_date: null,
     meta_login: '',
@@ -23,6 +23,25 @@ function submitForm() {
   });
 }
 
+const licenses = ref([])
+const loadingLicenses = ref(false);
+
+const getLicenses = async () => {
+    loadingLicenses.value = true;
+    try {
+        const response = await axios.get('/redeem/getLicenses');
+        licenses.value = response.data;
+    } catch (error) {
+        console.error('Error fetching licenses:', error);
+    } finally {
+        loadingLicenses.value = false;
+    }
+};
+
+onMounted(() => {
+    getLicenses();
+})
+
 </script>
 
 <template>
@@ -31,15 +50,15 @@ function submitForm() {
             <div class="flex flex-col justify-center gap-5">
                 <div class="flex flex-col justify-center gap-1">
                     <span class="font-semibold text-lg">Redemption</span>
-                    <span class="font-medium">Enter your redemption code and email below to redeem it.</span>
+                    <span class="font-medium">Select your product, expiration date, and enter your email below to redeem it.</span>
                 </div>
                 <div class="flex flex-col justify-center gap-3">
                     <span class="font-medium">Code Redemption Form</span>
 
                     <form @submit.prevent="submitForm" novalidate class="flex flex-col justify-center gap-3">
-                        <!-- Redemption Code-->
+                        <!-- Product -->
                         <div class="flex flex-col justify-center gap-1">
-                            <InputLabel for="redemption_code" value="Redemption Code" :invalid="!!form.errors.redemption_code" />
+                            <!-- <InputLabel for="redemption_code" value="Redemption Code" :invalid="!!form.errors.redemption_code" />
                             <InputText
                                 id="redemption_code"
                                 v-model="form.redemption_code"
@@ -47,7 +66,21 @@ function submitForm() {
                                 class="w-full"
                                 :invalid="!!form.errors.redemption_code"
                             />
-                            <InputError :message="form.errors.redemption_code" />
+                            <InputError :message="form.errors.redemption_code" /> -->
+
+                            <InputLabel for="product" value="Product" :invalid="!!form.errors.product" />
+                            <Select
+                                id="product"
+                                v-model="form.product"
+                                :options="licenses"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Select Product"
+                                class="w-full"
+                                :invalid="!!form.errors.product"
+                                :disabled="loadingLicenses"
+                            />
+                            <InputError :message="form.errors.product" />
                         </div>
 
                         <!-- Email-->
