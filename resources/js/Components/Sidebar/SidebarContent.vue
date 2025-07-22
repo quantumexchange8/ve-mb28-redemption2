@@ -26,12 +26,12 @@ import {
 import SidebarCategoryLabel from "@/Components/Sidebar/SidebarCategoryLabel.vue";
 
 const page = usePage();
-const pendingKYC = ref(0);
+const pendingRedemptionCodeRequest = ref(0);
 
 const getPendingCounts = async () => {
     try {
         const response = await axios.get('/getPendingCounts');
-        pendingKYC.value = response.data.pendingKYC
+        pendingRedemptionCodeRequest.value = response.data.pendingRedemptionCodeRequest
     } catch (error) {
         console.error('Error pending counts:', error);
     }
@@ -56,5 +56,28 @@ watchEffect(() => {
             'px-5 py-3': !sidebarState.isOpen && !sidebarState.isHovered,
         }"
     >
+        <!-- Dashboard -->
+        <SidebarLink
+            :title="$t('public.code_redemption')"
+            :href="route('redeem')"
+            :active="route().current('redeem')"
+        >
+            <template #icon>
+                <IconLayoutDashboard :size="20" stroke-width="1.25" />
+            </template>
+        </SidebarLink>
+
+        <!-- Pending -->
+        <SidebarLink
+            :title="$t('public.pending')"
+            :href="route('pending')"
+            :active="route().current('pending')"
+            :pendingCounts="pendingRedemptionCodeRequest"
+        >
+            <template #icon>
+                <IconClockDollar :size="20" stroke-width="1.25" />
+            </template>
+        </SidebarLink>
+
     </nav>
 </template>

@@ -35,6 +35,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'toast' => session('toast'),
+            'locale' => session('locale') ? session('locale') : app()->getLocale(),
         ];
     }
 }

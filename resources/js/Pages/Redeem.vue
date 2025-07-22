@@ -45,15 +45,15 @@ onMounted(() => {
 </script>
 
 <template>
-    <AuthenticatedLayout title="Code Redemption">
+    <AuthenticatedLayout :title="$t('public.code_redemption')">
         <div class="flex flex-col items-center justify-center p-5">
             <div class="flex flex-col justify-center gap-5">
                 <div class="flex flex-col justify-center gap-1">
-                    <span class="font-semibold text-lg">Redemption</span>
-                    <span class="font-medium">Select your product, expiration date, and enter your email below to redeem it.</span>
+                    <span class="font-semibold text-lg">{{ $t('public.redemption') }}</span>
+                    <span class="font-medium">{{ $t('public.redemption_condition') }}</span>
                 </div>
                 <div class="flex flex-col justify-center gap-3">
-                    <span class="font-medium">Code Redemption Form</span>
+                    <span class="font-medium">{{ $t('public.code_redemption') }}</span>
 
                     <form @submit.prevent="submitForm" novalidate class="flex flex-col justify-center gap-3">
                         <!-- Product -->
@@ -68,14 +68,14 @@ onMounted(() => {
                             />
                             <InputError :message="form.errors.redemption_code" /> -->
 
-                            <InputLabel for="product" value="Product" :invalid="!!form.errors.product" />
+                            <InputLabel for="product" :value="$t('public.product')" :invalid="!!form.errors.product" />
                             <Select
                                 id="product"
                                 v-model="form.product"
                                 :options="licenses"
                                 optionLabel="label"
                                 optionValue="value"
-                                placeholder="Select Product"
+                                :placeholder="$t('public.select_product')"
                                 class="w-full"
                                 :invalid="!!form.errors.product"
                                 :disabled="loadingLicenses"
@@ -85,11 +85,11 @@ onMounted(() => {
 
                         <!-- Email-->
                         <div class="flex flex-col justify-center gap-1">
-                            <InputLabel for="email" value="Email" :invalid="!!form.errors.email" />
+                            <InputLabel for="email" :value="$t('public.email')" :invalid="!!form.errors.email" />
                             <InputText
                                 id="email"
                                 v-model="form.email"
-                                placeholder="Enter your email"
+                                :placeholder="$t('public.enter_email')"
                                 class="w-full"
                                 :invalid="!!form.errors.email"
                             />
@@ -98,14 +98,14 @@ onMounted(() => {
 
                         <!-- Expired Date -->
                         <div class="flex flex-col justify-center gap-1">
-                            <InputLabel for="expired_date" value="Expired Date" :invalid="!!form.errors.expired_date" />
+                            <InputLabel for="expired_date" :value="$t('public.expired_date')" :invalid="!!form.errors.expired_date" />
                             <DatePicker
                                 id="expired_date"
                                 v-model="form.expired_date"
                                 selectionMode="single"
                                 :minDate="minDate"
                                 :manualInput="false"
-                                placeholder="Select expiry date"
+                                :placeholder="$t('public.select_expiry_date')"
                                 class="w-full"
                                 dateFormat="yy-mm-dd"
                                 :invalid="!!form.errors.expired_date"
@@ -115,11 +115,11 @@ onMounted(() => {
 
                         <!-- Meta Login -->
                         <div class="flex flex-col justify-center gap-1">
-                            <InputLabel for="meta_login" :invalid="!!form.errors.meta_login">Meta Login</InputLabel>
+                            <InputLabel for="meta_login" :invalid="!!form.errors.meta_login">{{ $t('public.meta_login') }}</InputLabel>
                             <InputText
                                 id="meta_login"
                                 v-model="form.meta_login"
-                                placeholder="Enter your Meta Login"
+                                :placeholder="$t('public.enter_meta_login')"
                                 class="w-full"
                                 :invalid="!!form.errors.meta_login"
                             />
@@ -128,7 +128,7 @@ onMounted(() => {
 
                         <!-- Submit Button -->
                         <Button
-                            label="Submit"
+                            :label="$t('public.submit')"
                             type="submit"
                             class="w-fit ml-auto"
                             :disabled="form.processing"

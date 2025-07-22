@@ -21,13 +21,19 @@ import { IconX } from '@tabler/icons-vue';
             }"
         >
             <div class="flex items-center self-stretch gap-2">
-                <ApplicationLogo aria-hidden="true" class="w-20 h-5 shrink-0 grow-0 overflow-hidden" />
-                <div
+                <ApplicationLogo
+                    aria-hidden="true"
+                    class="shrink-0 grow-0 overflow-hidden"
+                    :class="[
+                        (sidebarState.isOpen || sidebarState.isHovered) ? 'w-50 h-10' : 'w-15 h-5',
+                    ]"
+                />
+                <!-- <div
                     v-show="sidebarState.isOpen || sidebarState.isHovered"
                     class="text-surface-800 dark:text-white"
                 >
                     VE
-                </div>
+                </div> -->
             </div>
         </Link>
 

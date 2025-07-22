@@ -12,6 +12,7 @@ class Code extends Model
     protected $fillable = [
         'redemption_code',
         'meta_login',
+        'acc_name',
         'license_name',
         'expired_date',
         'status',

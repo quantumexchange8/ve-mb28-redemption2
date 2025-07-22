@@ -128,8 +128,8 @@ class RedemptionController extends Controller
         return back()->with('toast', [
             'title' => 'Code redemption successful',
             'message' => [
-                'Serial Number: ' . $serial_number,
-                'Expire Date: ' . $expired_date->format('Y-m-d')
+                trans('public.serial_number') . ': ' . $serial_number,
+                trans('public.expire_date') . ': ' . $expired_date->format('Y-m-d')
             ],
             'type' => 'success',
             'duration' => 0
