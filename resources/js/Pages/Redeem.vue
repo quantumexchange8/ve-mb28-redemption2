@@ -6,6 +6,10 @@ import InputLabel from '@/Components/InputLabel.vue';
 import InputError from '@/Components/InputError.vue';
 import { InputText, Button, Select, DatePicker } from 'primevue';
 
+const props = defineProps({
+    products: Array,
+})
+
 const form = useForm({
     product: '',
     email: '',
@@ -23,24 +27,8 @@ function submitForm() {
   });
 }
 
-const licenses = ref([])
-const loadingLicenses = ref(false);
+const licenses = ref(props.products)
 
-const getLicenses = async () => {
-    loadingLicenses.value = true;
-    try {
-        const response = await axios.get('/redeem/getLicenses');
-        licenses.value = response.data;
-    } catch (error) {
-        console.error('Error fetching licenses:', error);
-    } finally {
-        loadingLicenses.value = false;
-    }
-};
-
-onMounted(() => {
-    getLicenses();
-})
 
 </script>
 
@@ -78,7 +66,6 @@ onMounted(() => {
                                 :placeholder="$t('public.select_product')"
                                 class="w-full"
                                 :invalid="!!form.errors.product"
-                                :disabled="loadingLicenses"
                             />
                             <InputError :message="form.errors.product" />
                         </div>

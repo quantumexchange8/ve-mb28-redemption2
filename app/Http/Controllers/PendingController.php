@@ -34,18 +34,15 @@ class PendingController extends Controller
         if ($request->has('lazyEvent')) {
             $data = json_decode($request->only(['lazyEvent'])['lazyEvent'], true); //only() extract parameters in lazyEvent
 
-            $query = RedemptionCodeRequest::where('status', 'processing')
+            $query = RedemptionCodeRequest::where('status', 'pending')
                 ->with('items.product:id,name');
             
             // Handle search functionality
             $search = $data['filters']['global']['value'];
             if ($search) {
                 $query->where(function ($query) use ($search) {
-                    $query->where('lead_id', 'like', '%' . $search . '%')
-                    ->orWhere('first_name', 'like', '%' . $search . '%')
-                    ->orWhere('surname', 'like', '%' . $search . '%')
-                    ->orWhere('email', 'like', '%' . $search . '%')
-                    ->orWhere('telephone', 'like', '%' . $search . '%');
+                    $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('meta_login', 'like', '%' . $search . '%');
                 });
             }
 
@@ -171,10 +168,12 @@ class PendingController extends Controller
     
                 // Create new code
                 $newCode = Code::create([
+                    'user_id' => $redemptionCodeRequest->user_id,
                     'redemption_code' => $finalCode,
                     'meta_login' => $redemptionCodeRequest->meta_login,
                     'acc_name' => $redemptionCodeRequest->name,
                     'license_name' => $item->product->slug,
+                    'product_name' => $item->product->name,
                     'expired_date' => $expiredDate,
                 ]);
     
@@ -190,6 +189,9 @@ class PendingController extends Controller
     
                 $serial_number = base64_encode($code2);
     
+                $newCode->serial_number = $serial_number;
+                $newCode->save();
+
                 $messages[] = trans('public.product') . ': ' . $item->product->name;
                 $messages[] = trans('public.serial_number') . ': ' . $serial_number;
             }

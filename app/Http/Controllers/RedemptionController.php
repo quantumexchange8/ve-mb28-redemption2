@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Code;
+use Inertia\Inertia;
 use App\Models\EmailRedeem;
 use Illuminate\Http\Request;
 use App\Models\SettingLicense;
@@ -12,20 +13,21 @@ use Illuminate\Support\Facades\Validator;
 
 class RedemptionController extends Controller
 {
-    public function getLicenses()
+    public function index()
     {
-        $licenses = SettingLicense::select('id', 'name')->get();
-
-        $formatted = [];
-
-        foreach ($licenses as $license) {
-            $formatted[] = [
-                'label' => $license->name,
-                'value' => $license->id,
+        $rawProducts = SettingLicense::select('id', 'name')->get();
+        $products = [];
+        
+        foreach ($rawProducts as $product) {
+            $products[] = [
+                'label' => $product->name,
+                'value' => $product->id,
             ];
         }
-
-        return response()->json($formatted);
+        
+        return Inertia::render('Redeem', [
+            'products' => $products,
+        ]);
     }
 
     public function redeemCode(Request $request)
@@ -136,4 +138,65 @@ class RedemptionController extends Controller
         ]);
 
     }
+
+    public function redemptionCodes()
+    {
+        return Inertia::render('Redemption/RedemptionCode');
+    }
+
+    public function getRedemptionCodesData(Request $request)
+    {
+        if ($request->has('lazyEvent')) {
+            $data = json_decode($request->only(['lazyEvent'])['lazyEvent'], true);
+    
+            $query = Code::query();
+    
+            // Handle search
+            $search = $data['filters']['global']['value'] ?? null;
+            if ($search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('meta_login', 'like', '%' . $search . '%')
+                          ->orWhere('acc_name', 'like', '%' . $search . '%')
+                          ->orWhere('serial_number', 'like', '%' . $search . '%');
+                });
+            }
+
+            $startDate = $data['filters']['start_date']['value'] ?? null;
+            $endDate = $data['filters']['end_date']['value'] ?? null;
+
+            // Handle Date
+            if ($startDate && $endDate) {
+                $start_date = Carbon::parse($startDate)->startOfDay();
+                $end_date = Carbon::parse($endDate)->endOfDay();
+                
+                $query->whereBetween('created_at', [$start_date, $end_date]);
+            }
+
+            // Handle status
+            $status = $data['filters']['status']['value'] ?? null;
+            if ($status) {
+                $query->where(function ($query) use ($status) {
+                    $query->where('status', $status);
+                });
+            }
+            
+            // Handle sorting
+            if (!empty($data['sortField']) && !empty($data['sortOrder'])) {
+                $order = $data['sortOrder'] == 1 ? 'asc' : 'desc';
+                $query->orderBy($data['sortField'], $order);
+            } else {
+                $query->orderByDesc('created_at');
+            }
+    
+            // Handle pagination
+            $rowsPerPage = $data['rows'] ?? 15;
+            $result = $query->paginate($rowsPerPage);
+        }
+    
+        return response()->json([
+            'success' => true,
+            'data' => $result,
+        ]);
+    }
+    
 }

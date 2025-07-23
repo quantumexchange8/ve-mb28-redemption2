@@ -9,11 +9,14 @@ return new class extends Migration {
     {
         Schema::create('codes', function (Blueprint $table) {
             $table->id();
+            $table->unsignedInteger('user_id')->nullable();
             $table->string('redemption_code');
             $table->unsignedInteger('meta_login')->nullable();
             $table->string('acc_name')->nullable();
             $table->string('broker_name')->nullable();
             $table->string('license_name')->nullable();
+            $table->string('product_name')->nullable();
+            $table->string('serial_number')->nullable();
             $table->date('expired_date')->nullable();
             $table->string('status')->default('valid');
             $table->timestamps();

@@ -9,7 +9,7 @@ class DashboardController extends Controller
 {
     public function getPendingCounts()
     {
-        $pendingRedemptionCodeRequest = RedemptionCodeRequest::where('status', 'processing')->count();
+        $pendingRedemptionCodeRequest = RedemptionCodeRequest::where('status', 'pending')->count();
 
         return response()->json([
             'pendingRedemption' => $pendingRedemptionCodeRequest,

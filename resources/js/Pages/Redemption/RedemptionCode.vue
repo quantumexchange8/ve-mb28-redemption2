@@ -35,8 +35,6 @@ import { FilterMatchMode } from '@primevue/core/api';
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import PendingAction from "@/Pages/Pending/Partials/PendingAction.vue";
-import HandleRequest from "@/Pages/Pending/Partials/HandleRequest.vue";
 
 const props = defineProps({
     products: Array,
@@ -45,7 +43,7 @@ const props = defineProps({
 const isLoading = ref(false);
 const dt = ref(null);
 const pendingRequests = ref();
-const { formatRgbaColor, formatAmount, formatDateTime, formatNameLabel } = generalFormat();
+const { formatRgbaColor, formatAmount, formatDateTime, formatNameLabel, formatSeverity } = generalFormat();
 const totalRecords = ref(0);
 const first = ref(0);
 const visible = ref(false);
@@ -58,6 +56,9 @@ const rowClicked = (data) => {
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  start_date: { value: null, matchMode: FilterMatchMode.EQUALS },
+  end_date: { value: null, matchMode: FilterMatchMode.EQUALS },
+  status: { value: null, matchMode: FilterMatchMode.EQUALS },
 });
 
 // const initialLoaded = ref(true);
@@ -67,6 +68,13 @@ watch(filters, debounce(() => {
     //     initialLoaded.value = false;
     //     return;
     // }
+
+    const { start_date, end_date } = filters.value;
+    const start = start_date?.value;
+    const end = end_date?.value;
+
+    // Skip if only one date is filled
+    if ((start && !end) || (!start && end)) return;
 
     first.value = 0;
     loadLazyData();
@@ -102,7 +110,7 @@ const loadLazyData = (event) => {
                 lazyEvent: JSON.stringify(lazyParams.value),
             };
 
-            const url = route('pending.getRedemptionCodeRequest', params);
+            const url = route('redeem.getRedemptionCodesData', params);
 
             const response = await fetch(url, {
                 signal: abortController.value.signal,
@@ -152,20 +160,50 @@ onMounted(() => {
     loadLazyData();
 });
 
-// const op = ref();
-// const toggle = (event) => {
-//     op.value.toggle(event);
-// }
+const selectedDate = ref([]);
+
+const clearDate = () => {
+    selectedDate.value = [];
+};
+
+watch(selectedDate, (newDateRange) => {
+    if(Array.isArray(newDateRange)) {
+        const [startDate, endDate] = newDateRange; 
+        filters.value['start_date'].value = startDate;
+        filters.value['end_date'].value = endDate;
+
+        if(startDate !== null && endDate !== null){
+            // loadLazyData();
+        }
+    } else {
+        console.warn('Invalid date range format:', newDateRange);
+    }
+});
+
+//filter status
+const status = ref(['valid', 'redeemed']);
+const statusValue = ref(filters.value.status.value);
+
+watch(statusValue, (val) => {
+    filters.value['status'].value = val;
+});
+
+const op = ref();
+const toggle = (event) => {
+    op.value.toggle(event);
+}
 
 const clearFilterGlobal = () => {
     filters.value['global'].value = null;
 }
 
-// const clearFilter = () => {
-//     filters.value = {
-//         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-//     };
-// };
+const clearFilter = () => {
+    filters.value['global'].value = null;
+    filters.value['start_date'].value = null;
+    filters.value['end_date'].value = null;
+    filters.value['status'].value = null;
+    selectedDate.value = [];
+};
 
 watch(() => usePage().props.toast, (toast) => {
         if (toast !== null) {
@@ -174,6 +212,7 @@ watch(() => usePage().props.toast, (toast) => {
         }
     }
 );
+
 </script>
 
 <template>
@@ -215,9 +254,9 @@ watch(() => usePage().props.toast, (toast) => {
                                 <IconCircleXFilled size="16" />
                             </div>
                         </div>
-                        <!-- <div class="w-full flex flex-col gap-3 md:flex-row">
+                        <div class="w-full flex flex-col gap-3 md:flex-row">
                             <div class="w-full md:w-[272px]">
-                                <DatePicker
+                                <!-- <DatePicker
                                     v-model="selectedDate"
                                     selectionMode="range"
                                     :manualInput="false"
@@ -235,7 +274,7 @@ watch(() => usePage().props.toast, (toast) => {
                                     @click="clearDate"
                                 >
                                     <IconX size="20" />
-                                </div>
+                                </div> -->
                                 <Button
                                     type="button"
                                     severity="secondary"
@@ -249,7 +288,7 @@ watch(() => usePage().props.toast, (toast) => {
                                     </div>
                                 </Button>
                             </div>
-                            <div class="w-full flex flex-col md:flex-row justify-end gap-2">
+                            <!-- <div class="w-full flex flex-col md:flex-row justify-end gap-2">
                                 <Button
                                     v-if="selectedFiles?.length > 0"
                                     variant="primary-flat"
@@ -265,8 +304,8 @@ watch(() => usePage().props.toast, (toast) => {
                                 >
                                     {{ $t('public.export') }}
                                 </Button>
-                            </div>
-                        </div> -->
+                            </div> -->
+                        </div>
                     </div>
                 </template>
                 <template #empty>
@@ -282,34 +321,96 @@ watch(() => usePage().props.toast, (toast) => {
                     </div>
                 </template>
                 <template v-if="pendingRequests?.length > 0">
-                    <Column field="name" :header="$t('public.name')" />
-                    <Column field="meta_login" :header="$t('public.meta_login')" />
-                    <Column field="product_ids" :header="$t('public.products')">
+                    <Column
+                        field="created_at"
+                        sortable
+                        class="table-cell min-w-36"
+                        :header="$t('public.date')"
+                    >
+                        <template #body="{data}">
+                            {{ dayjs(data.created_at).format('YYYY-MM-DD') }}
+                            <div class="text-xs text-surface-500">
+                                {{ dayjs(data.created_at).format('HH:mm:ss') }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="acc_name" :header="$t('public.name')" headerClass="text-nowrap" />
+                    <Column field="meta_login" :header="$t('public.meta_login')" headerClass="text-nowrap" />
+                    <Column field="product_name" :header="$t('public.product')" headerClass="text-nowrap" bodyClass="text-nowrap" />
+                    <Column
+                        field="expired_date"
+                        sortable
+                        class="table-cell min-w-36"
+                        :header="$t('public.expired_date')"
+                    >
+                        <template #body="{data}">
+                            {{ data.expired_date ? dayjs(data.expired_date).format('YYYY-MM-DD') : '-' }}
+                        </template>
+                    </Column>
+                    <Column field="status" :header="$t('public.status')" headerClass="text-nowrap" bodyClass="text-nowrap">
                         <template #body="{ data }">
-                            <span>
-                                {{ data.products?.map(p => p.label).join(', ') }}
-                            </span>
+                            <Tag :value="$t(`public.${data.status}`)" :severity="formatSeverity(data.status)" />
                         </template>
                     </Column>
-                    <Column :header="$t('public.actions')">
-                        <template #body="slotProps">
-                            <PendingAction 
-                                :pendingRequests="slotProps.data" 
-                                :products="props.products"
-                                :isLoading="isLoading"
-                            />
-                        </template>
-                    </Column>
+                    <Column field="serial_number" :header="$t('public.serial_number')" headerClass="text-nowrap" />
                 </template>
-
             </DataTable>
 
-            <HandleRequest
-                :visible="visible"
-                :data="pendingData"
-                :products="props.products"
-                @update:visible="visible = $event"
-            />
+            <Popover ref="op">
+                <div class="flex flex-col gap-6 w-72">
+                    <!-- Filter Date -->
+                    <div class="flex flex-col gap-2 items-center self-stretch">
+                        <div class="flex self-stretch text-sm text-surface-950">
+                            {{ $t('public.filter_by_date') }}
+                        </div>
+                        <div class="relative w-full">
+                            <DatePicker
+                                v-model="selectedDate"
+                                dateFormat="dd/mm/yy"
+                                selectionMode="range"
+                                placeholder="dd/mm/yyyy - dd/mm/yyyy"
+                                class="w-full"
+                            />
+                            <div
+                                v-if="selectedDate && selectedDate.length > 0"
+                                class="absolute top-2/4 -mt-2 right-2 text-surface-400 select-none cursor-pointer bg-transparent"
+                                @click="clearDate"
+                            >
+                                <IconX :size="15" strokeWidth="1.5"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter status -->
+                    <div class="flex flex-col gap-2 items-center self-stretch">
+                        <div class="flex self-stretch text-xs text-surface-950 font-semibold">
+                            {{ $t('public.filter_by_status') }}
+                        </div>
+                        <div class="flex flex-col items-start w-full gap-1">
+                            <div
+                                v-for="option in status"
+                                class="flex items-center gap-2 text-sm"
+                            >
+                                <RadioButton
+                                    v-model="filters['status'].value"
+                                    :inputId="option"
+                                    :name="option"
+                                    :value="option"
+                                />
+                                <label :for="option">{{ $t(`public.${option}`) }}</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <Button
+                        type="button"
+                        severity="info"
+                        class="w-full"
+                        @click="clearFilter()"
+                        :label="$t('public.clear_all')"
+                    />
+                </div>
+            </Popover>
 
         </div>
     </AuthenticatedLayout>

@@ -21,7 +21,8 @@ import {
     IconChartPie,
     IconId,
     IconServerCog,
-    IconSettingsDollar
+    IconSettingsDollar,
+    IconTicket
 } from '@tabler/icons-vue';
 import SidebarCategoryLabel from "@/Components/Sidebar/SidebarCategoryLabel.vue";
 
@@ -79,5 +80,16 @@ watchEffect(() => {
             </template>
         </SidebarLink>
 
+        <!-- Redemption Codes -->
+        <SidebarLink
+            :title="$t('public.redemption_codes')"
+            :href="route('redeem.redemptionCodes')"
+            :active="route().current('redeem.redemptionCodes')"
+            :pendingCounts="pendingRedemptionCodeRequest"
+        >
+            <template #icon>
+                <IconTicket :size="20" stroke-width="1.25" />
+            </template>
+        </SidebarLink>
     </nav>
 </template>

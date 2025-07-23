@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id');
             $table->string('name')->nullable();
             $table->string('meta_login')->nullable();
-            $table->string('status')->default('processing');
+            $table->string('status')->default('pending');
             $table->string('remarks')->nullable();
             $table->timestamp('approved_at')->nullable();
             $table->timestamps();
