@@ -21,9 +21,10 @@ Route::get('/', function () {
     return redirect(route('login'));
 });
 
-Route::get('/redeem', [RedemptionController::class, 'index'])->middleware(['auth', 'verified'])->name('redeem');
+Route::middleware(['auth', 'verified', 'role:super-admin|admin'])->group(function () {
+    // Dashboard
+    Route::get('/redeem', [RedemptionController::class, 'index'])->name('redeem');
 
-Route::middleware('auth')->group(function () {
     Route::get('/getPendingCounts', [DashboardController::class, 'getPendingCounts'])->name('dashboard.getPendingCounts');
 
     Route::prefix('pending')->group(function () {
