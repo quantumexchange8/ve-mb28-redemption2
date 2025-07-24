@@ -84,68 +84,55 @@ class PendingController extends Controller
 
     }
 
-    public function updateRedemptionRequest(Request $request)
+    public function handleRedemptionCodeRequest(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'id' => 'required|exists:redemption_code_requests,id',
+            'action' => 'required|in:approve,reject',
             'name' => 'required|string|max:255',
             'meta_login' => 'required|string|max:255',
             'product_ids' => 'required|array',
             'product_ids.*' => 'exists:setting_licenses,id',
+            'remarks' => 'sometimes|nullable|string|max:255',
+            'expired_date' => 'required_if:action,approve|nullable|date|after_or_equal:today',
         ])->setAttributeNames([
             'name' => trans('public.name'),
             'meta_login' => trans('public.meta_login'),
             'product_ids' => trans('public.products'),
+            'remarks' => trans('public.remarks'),
+            'expired_date' => trans('public.expired_date'),
         ]);
         $validator->validate();
     
-        $requestRecord = RedemptionCodeRequest::findOrFail($request->input('id'));
+        $requestRecord = RedemptionCodeRequest::with('items.product')->findOrFail($request->input('id'));
     
-        // Update main fields
-        $requestRecord->update($request->only(['name', 'meta_login']));
+        // Update editable fields
+        $requestRecord->update([
+            'name' => $request->input('name'),
+            'meta_login' => $request->input('meta_login'),
+        ]);
     
-        // Normalize input
+        // Update products
         $newLicenseIds = array_unique(array_map('intval', $request->input('product_ids')));
         $existingLicenseIds = $requestRecord->items()->pluck('setting_license_id')->toArray();
     
         $toAdd = array_diff($newLicenseIds, $existingLicenseIds);
         $toDelete = array_diff($existingLicenseIds, $newLicenseIds);
     
-        // Only touch DB if there’s something to change
-        if (!empty($toAdd) || !empty($toDelete)) {
-            if (!empty($toDelete)) {
-                $requestRecord->items()->whereIn('setting_license_id', $toDelete)->delete();
-            }
-    
-            foreach ($toAdd as $licenseId) {
-                $requestRecord->items()->create([
-                    'setting_license_id' => $licenseId,
-                ]);
-            }
+        if (!empty($toDelete)) {
+            $requestRecord->items()->whereIn('setting_license_id', $toDelete)->delete();
+        }
+        foreach ($toAdd as $licenseId) {
+            $requestRecord->items()->create(['setting_license_id' => $licenseId]);
         }
     
-        return back()->with('toast', [
-            'title' => trans('public.toast_redemption_code_request_update_success'),
-            'type' => 'success',
-        ]);
-    }
-    
-    public function handleRedemptionCodeRequest(Request $request)
-    {
-        $request->validate([
-            'id' => 'required|exists:redemption_code_requests,id',
-            'action' => 'required|in:approve,reject',
-            'remarks' => 'required|string|max:255',
-            'expired_date' => 'sometimes|required_if:action,approve|nullable|date|after_or_equal:today',
-        ]);
-    
-        $redemptionCodeRequest = RedemptionCodeRequest::with('items.product')->findOrFail($request->input('id'));
+        // Process approval or rejection
         $status = $request->input('action') === 'approve' ? 'approved' : 'rejected';
-    
-        $redemptionCodeRequest->update([
+        $requestRecord->update([
             'remarks' => $request->input('remarks'),
             'status' => $status,
             'approved_at' => now(),
+            'expired_date' => $request->input('expired_date'),
         ]);
     
         $messages = [];
@@ -153,7 +140,7 @@ class PendingController extends Controller
         if ($status === 'approved') {
             $expiredDate = Carbon::parse($request->input('expired_date'))->startOfDay();
     
-            foreach ($redemptionCodeRequest->items as $item) {
+            foreach ($requestRecord->items as $item) {
                 $shortform = $item->product->shortform;
     
                 // Generate unique code
@@ -166,15 +153,16 @@ class PendingController extends Controller
                     $finalCode = $shortform . $random;
                 } while (Code::where('redemption_code', $finalCode)->exists());
     
-                // Create new code
+                // Create code
                 $newCode = Code::create([
-                    'user_id' => $redemptionCodeRequest->user_id,
+                    'user_id' => $requestRecord->user_id,
                     'redemption_code' => $finalCode,
-                    'meta_login' => $redemptionCodeRequest->meta_login,
-                    'acc_name' => $redemptionCodeRequest->name,
+                    'meta_login' => $request->input('meta_login'),
+                    'acc_name' => $request->input('name'),
                     'license_name' => $item->product->slug,
                     'product_name' => $item->product->name,
                     'expired_date' => $expiredDate,
+                    'status' => 'redeemed',
                 ]);
     
                 // Build serial number
@@ -188,10 +176,9 @@ class PendingController extends Controller
                 }
     
                 $serial_number = base64_encode($code2);
-    
                 $newCode->serial_number = $serial_number;
                 $newCode->save();
-
+    
                 $messages[] = trans('public.product') . ': ' . $item->product->name;
                 $messages[] = trans('public.serial_number') . ': ' . $serial_number;
             }

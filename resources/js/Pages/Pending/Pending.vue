@@ -35,7 +35,6 @@ import { FilterMatchMode } from '@primevue/core/api';
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import PendingAction from "@/Pages/Pending/Partials/PendingAction.vue";
 import HandleRequest from "@/Pages/Pending/Partials/HandleRequest.vue";
 
 const props = defineProps({
@@ -291,15 +290,6 @@ watch(() => usePage().props.toast, (toast) => {
                             </span>
                         </template>
                     </Column>
-                    <Column :header="$t('public.actions')">
-                        <template #body="slotProps">
-                            <PendingAction 
-                                :pendingRequests="slotProps.data" 
-                                :products="props.products"
-                                :isLoading="isLoading"
-                            />
-                        </template>
-                    </Column>
                 </template>
 
             </DataTable>
@@ -308,6 +298,7 @@ watch(() => usePage().props.toast, (toast) => {
                 :visible="visible"
                 :data="pendingData"
                 :products="props.products"
+                :isLoading="isLoading"
                 @update:visible="visible = $event"
             />
 

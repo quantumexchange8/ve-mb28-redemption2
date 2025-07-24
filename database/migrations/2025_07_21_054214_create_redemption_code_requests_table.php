@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->string('status')->default('pending');
             $table->string('remarks')->nullable();
             $table->timestamp('approved_at')->nullable();
+            $table->date('expired_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

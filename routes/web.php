@@ -30,7 +30,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [PendingController::class, 'index'])->name('pending');
         Route::get('/getRedemptionCodeRequest', [PendingController::class, 'getRedemptionCodeRequest'])->name('pending.getRedemptionCodeRequest');
 
-        Route::post('/updateRedemptionRequest', [PendingController::class, 'updateRedemptionRequest'])->name('pending.updateRedemptionRequest');
         Route::post('/handleRedemptionCodeRequest', [PendingController::class, 'handleRedemptionCodeRequest'])->name('pending.handleRedemptionCodeRequest');
     });
 
