@@ -11,6 +11,7 @@ class Code extends Model
 
     protected $fillable = [
         'user_id',
+        'redemption_code_request_id',
         'redemption_code',
         'meta_login',
         'acc_name',
@@ -20,4 +21,16 @@ class Code extends Model
         'expired_date',
         'status',
     ];
+
+    protected $dates = ['expired_date'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function license()
+    {
+        return $this->belongsTo(SettingLicense::class, 'license_name', 'slug');
+    }
 }

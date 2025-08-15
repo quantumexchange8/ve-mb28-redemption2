@@ -9,8 +9,8 @@ return new class extends Migration {
     {
         Schema::create('email_redeems', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('code_id');
-            $table->string('email');
+            $table->unsignedBigInteger('code_id')->nullable();
+            $table->string('email')->nullable();
             $table->timestamps();
 
             $table->foreign('code_id')

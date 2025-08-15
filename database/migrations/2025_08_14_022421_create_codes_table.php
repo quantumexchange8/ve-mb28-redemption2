@@ -10,7 +10,8 @@ return new class extends Migration {
         Schema::create('codes', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('user_id')->nullable();
-            $table->string('redemption_code');
+            $table->unsignedBigInteger('redemption_code_request_id')->nullable();
+            $table->string('redemption_code')->nullable();
             $table->unsignedInteger('meta_login')->nullable();
             $table->string('acc_name')->nullable();
             $table->string('broker_name')->nullable();
@@ -20,6 +21,8 @@ return new class extends Migration {
             $table->date('expired_date')->nullable();
             $table->string('status')->default('valid');
             $table->timestamps();
+
+            $table->foreign('redemption_code_request_id')->references('id')->on('redemption_code_requests')->onUpdate('cascade')->onDelete('set null');
         });
     }
 

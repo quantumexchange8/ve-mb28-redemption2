@@ -68,6 +68,17 @@ watchEffect(() => {
             </template>
         </SidebarLink>
 
+        <!-- Member -->
+        <SidebarLink
+            :title="$t('public.member_listing')"
+            :href="route('member.listing')"
+            :active="route().current('member.listing')"
+        >
+            <template #icon>
+                <IconUsers :size="20" stroke-width="1.25" />
+            </template>
+        </SidebarLink>
+
         <!-- Pending -->
         <SidebarLink
             :title="$t('public.pending')"
@@ -91,5 +102,17 @@ watchEffect(() => {
                 <IconTicket :size="20" stroke-width="1.25" />
             </template>
         </SidebarLink>
+
+        <!-- Version Control -->
+        <SidebarLink
+            :title="$t('public.version')"
+            :href="route('version')"
+            :active="route().current('version')"
+        >
+            <template #icon>
+                <IconClipboardData :size="20" stroke-width="1.25" />
+            </template>
+        </SidebarLink>
+
     </nav>
 </template>

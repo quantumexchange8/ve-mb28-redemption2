@@ -7,7 +7,10 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Models\SettingLicense;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use App\Models\RedemptionCodeRequest;
+use App\Mail\RedemptionCodeUnlockedMail;
 use Illuminate\Support\Facades\Validator;
 
 class PendingController extends Controller
@@ -104,7 +107,7 @@ class PendingController extends Controller
         ]);
         $validator->validate();
     
-        $requestRecord = RedemptionCodeRequest::with('items.product')->findOrFail($request->input('id'));
+        $requestRecord = RedemptionCodeRequest::with(['items.product', 'user:id,email'])->findOrFail($request->input('id'));
     
         // Update editable fields
         $requestRecord->update([
@@ -125,7 +128,9 @@ class PendingController extends Controller
         foreach ($toAdd as $licenseId) {
             $requestRecord->items()->create(['setting_license_id' => $licenseId]);
         }
-    
+
+        $requestRecord->load('items.product');
+
         // Process approval or rejection
         $status = $request->input('action') === 'approve' ? 'approved' : 'rejected';
         $requestRecord->update([
@@ -136,7 +141,8 @@ class PendingController extends Controller
         ]);
     
         $messages = [];
-    
+        $codes = [];
+
         if ($status === 'approved') {
             $expiredDate = Carbon::parse($request->input('expired_date'))->startOfDay();
     
@@ -156,6 +162,7 @@ class PendingController extends Controller
                 // Create code
                 $newCode = Code::create([
                     'user_id' => $requestRecord->user_id,
+                    'redemption_code_request_id' => $requestRecord->id,
                     'redemption_code' => $finalCode,
                     'meta_login' => $request->input('meta_login'),
                     'acc_name' => $request->input('name'),
@@ -179,11 +186,22 @@ class PendingController extends Controller
                 $newCode->serial_number = $serial_number;
                 $newCode->save();
     
+                $codes[] = [
+                    'product_name'  => $item->product->name,
+                    'serial_number' => $serial_number,
+                ];
+        
                 $messages[] = trans('public.product') . ': ' . $item->product->name;
                 $messages[] = trans('public.serial_number') . ': ' . $serial_number;
             }
     
             $messages[] = trans('public.expire_date') . ': ' . $expiredDate->format('Y-m-d');
+
+            Mail::to($requestRecord->user->email)->send(new RedemptionCodeUnlockedMail(
+                'supporteam@simmigoh.info',
+                $requestRecord,
+                $codes
+            ));
         }
     
         return back()->with('toast', [

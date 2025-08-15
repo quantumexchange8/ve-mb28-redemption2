@@ -9,7 +9,9 @@ use Illuminate\Http\Request;
 use App\Models\SettingLicense;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Validator;
+use App\Exports\RedemptionCodeListingExport;
 
 class RedemptionController extends Controller
 {
@@ -188,14 +190,34 @@ class RedemptionController extends Controller
                 $query->orderByDesc('created_at');
             }
     
+            // Export logic
+            if ($request->has('exportStatus') && $request->exportStatus == true) {
+                $codes = $query; // Fetch all redemption code for export
+                return Excel::download(new RedemptionCodeListingExport($codes), now() . '-redemption_codes.xlsx');
+            }
+            
             // Handle pagination
             $rowsPerPage = $data['rows'] ?? 15;
             $result = $query->paginate($rowsPerPage);
+
+            // Optimized single query to get both counts (join on slug)
+            $counts = Code::join('setting_licenses', 'codes.license_name', '=', 'setting_licenses.slug')
+                ->selectRaw("
+                    SUM(CASE WHEN setting_licenses.type = 'indicator' THEN 1 ELSE 0 END) AS indicators_redeemed,
+                    SUM(CASE WHEN setting_licenses.type = 'ea' THEN 1 ELSE 0 END) AS eas_redeemed
+                ")
+                ->first();
+
+            $indicatorsRedeemed = $counts->indicators_redeemed ?? 0;
+            $easRedeemed = $counts->eas_redeemed ?? 0;
+        
         }
     
         return response()->json([
             'success' => true,
             'data' => $result,
+            'indicatorsRedeemed' => (float) $indicatorsRedeemed,
+            'easRedeemed' => (float) $easRedeemed,    
         ]);
     }
     

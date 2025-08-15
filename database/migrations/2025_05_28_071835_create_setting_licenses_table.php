@@ -9,12 +9,13 @@ return new class extends Migration {
     {
         Schema::create('setting_licenses', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('shortform');
-            $table->string('slug');
-            $table->string('category');
+            $table->string('name')->nullable();
+            $table->string('shortform')->nullable();
+            $table->string('slug')->nullable();
+            $table->string('category')->nullable();
+            $table->string('type')->nullable();
             $table->string('url')->nullable();
-            $table->integer('valid_year');
+            $table->integer('valid_year')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
