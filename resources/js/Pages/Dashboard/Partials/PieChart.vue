@@ -19,60 +19,69 @@ const props = defineProps({
 const canvasRef = ref(null);
 let chartInstance = null;
 
-const getRandomColor = () => {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-};
+// const getRandomColor = () => {
+//     const letters = '0123456789ABCDEF';
+//     let color = '#';
+//     for (let i = 0; i < 6; i++) {
+//         color += letters[Math.floor(Math.random() * 16)];
+//     }
+//     return color;
+// };
+
+const fixedColors = [
+  '#FF6384', // pink/red
+  '#36A2EB', // blue
+  '#FFCE56', // yellow
+  '#4BC0C0', // teal
+  '#9966FF'  // purple
+];
 
 const renderChart = () => {
-    if (!canvasRef.value) return;
-    if (chartInstance) chartInstance.destroy();
+  if (!canvasRef.value) return;
+  if (chartInstance) chartInstance.destroy();
 
-    const colors = props.chartData.labels.map(() => getRandomColor());
+//   const colors = props.chartData.labels.map(() => getRandomColor());
 
-    chartInstance = new Chart(canvasRef.value, {
-        type: 'pie',
-        data: {
-            labels: props.chartData.labels,
-            datasets: [{
-                data: props.chartData.values,
-                backgroundColor: colors, // dynamic colors
-            }]
+  chartInstance = new Chart(canvasRef.value, {
+    type: 'pie',
+    data: {
+      labels: props.chartData.labels,
+      datasets: [{
+        data: props.chartData.values,
+        // backgroundColor: colors, // dynamic colors
+        backgroundColor: fixedColors.slice(0, props.chartData.labels.length), // pick first N
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { 
+          display: true,
+          position: 'bottom',
         },
-        options: {
-            plugins: {
-                legend: { 
-                    display: true,
-                    position: 'bottom',
-                },
-                title: {
-                    display: !!props.title,
-                    text: props.title,
-                    align: 'start',
-                    font: { size: 16, weight: 'bold' }
-                },
-                datalabels: { display: false },
-                tooltip: {
-                    enabled: true,
-                    callbacks: {
-                        title: ctx => ctx[0].label,
-                        label: ctx => {
-                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                            const value = ctx.raw;
-                            const percent = ((value / total) * 100).toFixed(1);
-                            return ' ' + percent + '%';
-                        }
-                    }
-                }
-            },
-            responsive: true,
-            maintainAspectRatio: false
+        title: {
+          display: !!props.title,
+          text: props.title,
+          align: 'start',
+          font: { size: 16, weight: 'bold' }
+        },
+        datalabels: { display: false },
+        tooltip: {
+          enabled: true,
+          callbacks: {
+            title: ctx => ctx[0].label,
+            label: ctx => {
+              const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+              const value = ctx.raw;
+              const percent = ((value / total) * 100).toFixed(1);
+              return ' ' + percent + '%';
+            }
+          }
         }
-    });
+      },
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  });
 };
 
 watch(() => props.chartData, () => {
