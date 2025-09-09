@@ -7,6 +7,7 @@ import {onMounted, ref, watchEffect} from "vue";
 import {usePage} from "@inertiajs/vue3";
 import {
     IconLayoutDashboard,
+    IconClipboardText,
     IconUsers,
     IconUsersGroup,
     IconDatabaseDollar,
@@ -59,12 +60,23 @@ watchEffect(() => {
     >
         <!-- Dashboard -->
         <SidebarLink
+            :title="$t('public.dashboard')"
+            :href="route('dashboard')"
+            :active="route().current('dashboard')"
+        >
+            <template #icon>
+                <IconLayoutDashboard :size="20" stroke-width="1.25" />
+            </template>
+        </SidebarLink>
+
+        <!-- Code Redemption -->
+        <SidebarLink
             :title="$t('public.code_redemption')"
             :href="route('redeem')"
             :active="route().current('redeem')"
         >
             <template #icon>
-                <IconLayoutDashboard :size="20" stroke-width="1.25" />
+                <IconClipboardText :size="20" stroke-width="1.25" />
             </template>
         </SidebarLink>
 
@@ -96,7 +108,6 @@ watchEffect(() => {
             :title="$t('public.redemption_codes')"
             :href="route('redeem.redemptionCodes')"
             :active="route().current('redeem.redemptionCodes')"
-            :pendingCounts="pendingRedemptionCodeRequest"
         >
             <template #icon>
                 <IconTicket :size="20" stroke-width="1.25" />

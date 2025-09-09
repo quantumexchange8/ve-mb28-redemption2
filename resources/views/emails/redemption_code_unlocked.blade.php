@@ -20,22 +20,6 @@
 
 <body>
     <div>
-        <p style="margin-bottom:0pt; line-height:115%; font-size:12pt">
-            <span style="font-family:SimSun; font-weight:bold; color:#1f1f1f; background-color:#ffffff">
-                郵件標題：【立即啟用】您專屬交易武器已解鎖，請即刻查收！
-            </span>
-        </p>
-        <p style="margin-bottom:0pt; line-height:115%; font-size:12pt">
-            <span style="font-weight:bold; -aw-import:ignore">&#xa0;</span>
-        </p>
-        <p style="margin-bottom:0pt; line-height:115%; font-size:12pt">
-            <span style="font-weight:bold">
-                Email 
-            </span>
-            <span style="font-family:SimSun; font-weight:bold">
-                內容：
-            </span>
-        </p>
         <p style="margin-top:10pt; margin-bottom:10pt; line-height:normal; font-size:12pt">
             <span style="font-family:SimSun; background-color:#ffffff">
                 你好
@@ -44,7 +28,7 @@
             <span style="background-color:#ffffff">
                 {{ $record->name }} ,
             </span>
-        <p style="margin-top:10pt; margin-bottom:10pt; line-height:normal; font-size:12pt">
+        <!-- <p style="margin-top:10pt; margin-bottom:10pt; line-height:normal; font-size:12pt">
             <span style="font-family:SimSun; background-color:#ffffff">
                 在此，我們向您提供了独特的序列號
             </span>
@@ -54,10 +38,10 @@
             <span style="font-family:SimSun; background-color:#ffffff">
                 以及安裝步驟與操作說明指南
             </span>
-        </p>
+        </p> -->
         <p style="margin-top:10pt; margin-bottom:10pt; line-height:normal; font-size:12pt">
             <span style="font-family:SimSun; background-color:#ffffff">
-                然而，我們强調，這個序列號的保密性至關重要。
+                在此，我們强調，這個序列號的保密性至關重要。
             </span>
         </p>
         <p style="margin-bottom:0pt; line-height:115%; font-size:12pt">

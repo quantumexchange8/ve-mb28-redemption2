@@ -27,7 +27,7 @@ class RedemptionController extends Controller
             ];
         }
         
-        return Inertia::render('Redeem', [
+        return Inertia::render('Redeem/Redeem', [
             'products' => $products,
         ]);
     }
@@ -163,10 +163,9 @@ class RedemptionController extends Controller
                 });
             }
 
+            // Handle Date
             $startDate = $data['filters']['start_date']['value'] ?? null;
             $endDate = $data['filters']['end_date']['value'] ?? null;
-
-            // Handle Date
             if ($startDate && $endDate) {
                 $start_date = Carbon::parse($startDate)->startOfDay();
                 $end_date = Carbon::parse($endDate)->endOfDay();
@@ -174,6 +173,17 @@ class RedemptionController extends Controller
                 $query->whereBetween('created_at', [$start_date, $end_date]);
             }
 
+            // Handle expired_date filter
+            $expiredStartDate = $data['filters']['expired_start_date']['value'] ?? null;
+            $expiredEndDate = $data['filters']['expired_end_date']['value'] ?? null;
+
+            if ($expiredStartDate && $expiredEndDate) {
+                $expired_start = Carbon::parse($expiredStartDate)->startOfDay();
+                $expired_end = Carbon::parse($expiredEndDate)->endOfDay();
+                
+                $query->whereBetween('expired_date', [$expired_start, $expired_end]);
+            }
+            
             // Handle status
             $status = $data['filters']['status']['value'] ?? null;
             if ($status) {

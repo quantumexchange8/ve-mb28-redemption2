@@ -107,7 +107,7 @@ class PendingController extends Controller
         ]);
         $validator->validate();
     
-        $requestRecord = RedemptionCodeRequest::with(['items.product', 'user:id,email'])->findOrFail($request->input('id'));
+        $requestRecord = RedemptionCodeRequest::with(['items.product.latestVersion', 'user:id,email'])->findOrFail($request->input('id'));
     
         // Update editable fields
         $requestRecord->update([
@@ -129,7 +129,7 @@ class PendingController extends Controller
             $requestRecord->items()->create(['setting_license_id' => $licenseId]);
         }
 
-        $requestRecord->load('items.product');
+        $requestRecord->load('items.product.latestVersion');
 
         // Process approval or rejection
         $status = $request->input('action') === 'approve' ? 'approved' : 'rejected';
@@ -168,10 +168,11 @@ class PendingController extends Controller
                     'acc_name' => $request->input('name'),
                     'license_name' => $item->product->slug,
                     'product_name' => $item->product->name,
+                    'version' => $item->product->latestVersion?->version,
                     'expired_date' => $expiredDate,
                     'status' => 'redeemed',
                 ]);
-    
+                    
                 // Build serial number
                 $acc_name = $newCode->acc_name ? '&' . $newCode->acc_name : '';
                 $broker_name = $newCode->broker_name ? '*' . $newCode->broker_name : '';

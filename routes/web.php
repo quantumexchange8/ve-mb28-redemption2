@@ -25,9 +25,9 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified', 'role:super-admin|admin'])->group(function () {
     // Dashboard
-    Route::get('/redeem', [RedemptionController::class, 'index'])->name('redeem');
-
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/getPendingCounts', [DashboardController::class, 'getPendingCounts'])->name('dashboard.getPendingCounts');
+    Route::get('/getChartData', [DashboardController::class, 'getChartData'])->name('dashboard.getChartData');
 
     Route::prefix('pending')->group(function () {
         Route::get('/', [PendingController::class, 'index'])->name('pending');
@@ -59,6 +59,7 @@ Route::middleware(['auth', 'verified', 'role:super-admin|admin'])->group(functio
      * ==============================
      */
     Route::prefix('redeem')->group(function () {
+        Route::get('', [RedemptionController::class, 'index'])->name('redeem');
         Route::get('/getLicenses', [RedemptionController::class, 'getLicenses'])->name('redeem.getLicenses');
 
         Route::post('/redeemCode', [RedemptionController::class, 'redeemCode'])->name('redeem.redeemCode');

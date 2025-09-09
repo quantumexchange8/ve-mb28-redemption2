@@ -18,8 +18,10 @@ class RedemptionCodeListingExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        $records = $this->codes->select([
+        $records = $this->codes->with('user:id,email')
+            ->select([
                 'id',
+                'user_id',
                 'created_at',
                 'acc_name',
                 'meta_login',
@@ -30,15 +32,17 @@ class RedemptionCodeListingExport implements FromCollection, WithHeadings
             ])
             ->orderBy('id')
             ->get();
-
+    
         $exportData = [];
 
         foreach ($records as $record) {
             $exportData[] = [
                 'Date Created'   => $record->created_at ? Carbon::parse($record->created_at)->format('Y-m-d H:i:s') : '',
                 'Name'           => $record->acc_name ?? '',
+                'Email'          => $record->user->email ?? '',
                 'Meta Login'     => $record->meta_login ?? '',
                 'Product'        => $record->product_name ?? '',
+                'Product Version'=> $record->version ?? '',
                 'Expired Date'   => $record->expired_date ? Carbon::parse($record->expired_date)->format('Y-m-d') : '',
                 'Status'         => trans('public.' . $record->status),
                 'Serial Number'  => $record->serial_number ?? '',
@@ -53,8 +57,10 @@ class RedemptionCodeListingExport implements FromCollection, WithHeadings
         return [
             'Date Created',
             'Name',
+            'Email',
             'Meta Login',
             'Product',
+            'Product Version',
             'Expired Date',
             'Status',
             'Serial Number',

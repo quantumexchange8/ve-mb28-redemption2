@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string('broker_name')->nullable();
             $table->string('license_name')->nullable();
             $table->string('product_name')->nullable();
+            $table->string('version')->nullable();
             $table->string('serial_number')->nullable();
             $table->date('expired_date')->nullable();
             $table->string('status')->default('valid');

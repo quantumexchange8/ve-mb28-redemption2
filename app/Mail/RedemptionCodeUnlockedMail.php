@@ -23,7 +23,7 @@ class RedemptionCodeUnlockedMail extends Mailable
 
     public function build()
     {
-        return $this->subject(trans('public.redemption_code_unlocked'))
+        return $this->subject('交易武器已解鎖！Redemption Code Unlocked')
             ->view('emails.redemption_code_unlocked')
             ->with([
                 'contactEmail' => $this->contactEmail,

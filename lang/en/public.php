@@ -65,7 +65,9 @@ return [
     "select_expiry_date" => "Select expiry date",
     "serial_number" => "Serial Number",
     "expire_date" => "Expire Date",
-    "filter_date" => "Filter by Date",
+    "filter_by_expired_date" => "Filter By Expired Date",
+
+    "dashboard" => "Dashboard",
 
     "code" => "Code",
     "valid" => "Valid",

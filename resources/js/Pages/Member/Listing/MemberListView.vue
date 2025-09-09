@@ -260,7 +260,7 @@ watchEffect(() => {
                             <div class="relative inline-block w-full md:w-fit">
                                 <Button
                                     class="flex gap-3 items-center w-full md:w-fit font-bold"
-                                    severity="contrast"
+                                    severity="secondary"
                                     @click="toggle"
                                 >
                                     <IconAdjustments :size="20" stroke-width="1.5" />
@@ -271,7 +271,6 @@ watchEffect(() => {
                             </div>
                             <div class="w-full flex justify-end">
                                 <Button
-                                    severity="secondary"
                                     @click="exportMember"
                                     class="w-full md:w-auto"
                                 >
@@ -379,7 +378,7 @@ watchEffect(() => {
             <!-- Filter Date -->
             <div class="flex flex-col gap-2 items-center self-stretch">
                 <div class="flex self-stretch text-xs text-surface-950 dark:text-white font-semibold">
-                    {{ $t('public.filter_date') }}
+                    {{ $t('public.filter_by_date') }}
                 </div>
                 <div class="relative w-full">
                     <DatePicker
@@ -401,7 +400,7 @@ watchEffect(() => {
 
             <Button
                 type="button"
-                severity="help"
+                severity="info"
                 class="w-full"
                 @click="clearAll"
                 :label="$t('public.clear_all')"

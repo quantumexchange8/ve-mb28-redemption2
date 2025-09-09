@@ -1,8 +1,9 @@
 <script setup>
 import { Link } from '@inertiajs/vue3'
 import { sidebarState } from '@/Composables'
-import {IconCircle, IconAlertSquareRoundedFilled} from "@tabler/icons-vue";
+import { IconCircle, IconAlertSquareRoundedFilled, IconBellFilled } from "@tabler/icons-vue";
 import Badge from 'primevue/badge';
+import OverlayBadge from 'primevue/overlaybadge';
 
 const props = defineProps({
     href: {
@@ -57,11 +58,22 @@ const Tag = !props.external ? Link : 'a'
             >
                 {{ title }}
             </span>
-            <Badge
+            <!-- <Badge
                 v-if="pendingCounts > 0 && (sidebarState.isOpen || sidebarState.isHovered)"
                 :value="pendingCounts"
                 severity="info"
-            ></Badge>
+            ></Badge> -->
+            <OverlayBadge
+                v-if="pendingCounts > 0 && (sidebarState.isOpen || sidebarState.isHovered)"
+                :value="pendingCounts"
+                severity="danger"
+                size="small"
+            >
+                <div class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
+                    <IconBellFilled class="w-4 h-4 text-gray-700" />
+                </div>
+            </OverlayBadge>
+
         </div>
     </component>
     <button
@@ -89,14 +101,24 @@ const Tag = !props.external ? Link : 'a'
         >
             {{ title }}
         </span>
-        <div
+        <!-- <div
             v-if="pendingCounts"
             class="text-red-500"
         >
             <IconAlertSquareRoundedFilled
                 size="20"
             />
-        </div>
+        </div> -->
+        <OverlayBadge
+            v-if="pendingCounts"
+            :value="pendingCounts"
+            severity="danger"
+            size="small"
+        >
+            <div class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
+                <IconBellFilled class="w-4 h-4 text-gray-700" />
+            </div>
+        </OverlayBadge>
         <slot name="arrow" />
     </button>
 </template>
